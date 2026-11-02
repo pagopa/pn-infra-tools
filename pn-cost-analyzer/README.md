@@ -58,3 +58,28 @@ Opzioni principali (`--help` per l'elenco completo):
 - `pn-costs_<start>_<end>_trend.csv`: metriche di trend per ogni elemento e livello di aggregazione.
 
 Nota: i costi degli ultimi giorni sono spesso *stimati* da AWS; usare `--refresh` per aggiornarli.
+
+## Rilevamento anomalie (`pn_cost_anomalies.py`)
+
+Legge il `_raw.csv` prodotto da `pn_cost_analyzer.py` (nessuna chiamata AWS) e individua, per account e per
+Microservice / servizio AWS / usage type / dettaglio:
+
+- **picchi anomali**: giorni molto sopra il costo atteso (z-score robusto su mediana mobile, corretto per
+  giorno della settimana); un salto che resta alto viene classificato come aumento a gradino;
+- **aumenti sostenuti**: crescita graduale (test di Mann-Kendall + pendenza di Theil-Sen), aumento a gradino o
+  nuovo costo, confrontando la media giornaliera degli ultimi 14 giorni con quella dei primi 14;
+- **addebiti di inizio mese** (es. abbonamenti, Shield), separati dall'analisi e confrontati mese su mese.
+  Il servizio `Tax` è escluso di default.
+
+```bash
+# ultimo *_raw.csv in output/
+python3 pn_cost_anomalies.py
+
+# file specifico, soglie personalizzate, ultimi 30 giorni
+python3 pn_cost_anomalies.py --input output/pn-costs_2026-08-30_2026-10-29_raw.csv --days 30 \
+    --min-monthly-increase 200 --spike-z 6
+```
+
+Output in `output/`: `pn-cost-anomalies_<start>_<end>.html` (sintesi per il management in inglese, con tabelle ordinabili e grafici) e
+`pn-cost-anomalies_<start>_<end>.xlsx` (sintesi, account, aumenti, picchi, addebiti di inizio mese,
+serie giornaliere, grafici, parametri). Soglie e livelli sono configurabili, vedere `--help`.
