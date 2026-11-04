@@ -688,7 +688,13 @@ def render_issues_csv(issues: list[SecurityIssue], out: TextIO) -> None:
     writer = csv.writer(out)
     writer.writerow(ISSUES_CSV_HEADER)
     for issue in issues:
-        writer.writerow(issue.to_csv_row())
+        writer.writerow([
+            "'" + value
+            if value.lstrip().startswith(("=", "+", "-", "@"))
+            or value.startswith(("\t", "\r", "\n"))
+            else value
+            for value in issue.to_csv_row()
+        ])
 
 
 def report_date_label(now: datetime | None = None) -> str:
