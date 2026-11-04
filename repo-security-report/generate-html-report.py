@@ -853,16 +853,20 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         .map(item => {
           const data = getSourceData(item);
           let visibleTotal;
+          let severityTotal = 0;
           if (sevMode) {
-            visibleTotal = severityConfig.reduce((sum, severity) => {
+            severityTotal = severityConfig.reduce((sum, severity) => {
               return sum + (state.selectedSeverities.has(severity.key) ? data[severity.key] : 0);
             }, 0);
+            visibleTotal = state.source === 'all'
+              ? severityTotal + (data.secrets ?? 0) + (data.renovate ?? 0)
+              : severityTotal;
           } else if (state.source === 'secrets') {
             visibleTotal = data.secrets;
           } else {
             visibleTotal = data.renovate;
           }
-          return { ...item, ...data, visibleTotal };
+          return { ...item, ...data, visibleTotal, severityTotal };
         })
         .filter(item => item.visibleTotal > 0)
         .sort(sortRows);
@@ -893,8 +897,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         acc.secrets  += row.secrets  ?? 0;
         acc.renovate += row.renovate ?? 0;
         acc.total    += row.visibleTotal;
+        acc.severityTotal += row.severityTotal;
         return acc;
-      }, { critical: 0, high: 0, medium: 0, low: 0, unknown: 0, secrets: 0, renovate: 0, total: 0 });
+      }, { critical: 0, high: 0, medium: 0, low: 0, unknown: 0, secrets: 0, renovate: 0, total: 0, severityTotal: 0 });
     }
 
     function renderStats(totals, rows) {
@@ -956,7 +961,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
     function renderDonutChart(totals) {
       if (!isSeveritySource()) return;
-      const total = totals.total;
+      const total = totals.severityTotal;
       elements.donutTotal.textContent = formatNumber(total);
 
       if (total === 0) {
