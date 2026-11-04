@@ -917,6 +917,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     function renderBarChart(rows) {
       const topRows = rows
         .filter(row => row.visibleTotal > 0)
+        .sort((left, right) => right.visibleTotal - left.visibleTotal)
         .slice(0, 12);
 
       if (topRows.length === 0) {
