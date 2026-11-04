@@ -404,9 +404,9 @@ def iter_dependabot_alerts(repo: str, state: str, token: str) -> Iterable[dict]:
 
 
 def iter_code_scanning_alerts(repo: str, state: str, token: str) -> Iterable[dict]:
-    # code-scanning uses "open" / "dismissed" / "fixed" — map our state
-    cs_state = "open" if state == "open" else state
-    query = parse.urlencode({"state": cs_state, "per_page": "100"})
+    if state == "auto_dismissed":
+        return
+    query = parse.urlencode({"state": state, "per_page": "100"})
     yield from _iter_paginated(f"{API_BASE}/repos/{repo}/code-scanning/alerts?{query}", token)
 
 
