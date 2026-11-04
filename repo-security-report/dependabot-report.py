@@ -630,7 +630,8 @@ def render_table(
     print(f"| {'REPOSITORY':<45} | ACTIVE SECRETS | RENOVATE PRs OPEN |", file=out)
     print(sep2, file=out)
     for row in rows:
-        print(f"| {row.repository:<45} | {row.secret_scanning:<14} | {row.renovate_prs:<17} |", file=out)
+        active_count = int(row.secret_scanning)  # numeric count only, no secret values
+        print(f"| {row.repository:<45} | {active_count:<14} | {row.renovate_prs:<17} |", file=out)
     print(sep2, file=out)
     print(
         f"| {'TOTAL':<45} | {sum(r.secret_scanning for r in rows):<14} | "
