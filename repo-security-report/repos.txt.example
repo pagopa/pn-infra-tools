@@ -1,0 +1,7 @@
+# List of GitHub repositories to scan for Dependabot vulnerabilities
+# Format: owner/repo  (one per line)
+# Lines starting with # are ignored
+
+pagopa/pn-infra
+pagopa/pn-delivery
+pagopa/pn-delivery-push
