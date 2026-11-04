@@ -17,7 +17,7 @@ The report can be published to **Confluence** (space `PN`) as a static page that
 
 ## Authentication
 
-The script uses the `gh` CLI for all API calls. A **401 Bad credentials** error means the CLI is not authenticated or the token lacks the required scopes.
+The script calls the GitHub REST API directly using `GH_TOKEN`; it does not read the `gh` CLI credential store. After completing the CLI login steps below, run `export GH_TOKEN="$(gh auth token)"` before invoking the report, or set `GH_TOKEN` in `.env` as shown below. A **401 Bad credentials** response indicates that the token is invalid or expired.
 
 ### Step 1 — Log in
 
