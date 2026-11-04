@@ -370,8 +370,18 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       top: 0;
       background: rgba(18, 25, 51, 0.97);
       backdrop-filter: blur(8px);
-      cursor: pointer;
       user-select: none;
+    }
+
+    .sort-button {
+      all: unset;
+      cursor: pointer;
+      box-sizing: border-box;
+    }
+
+    .sort-button:focus-visible {
+      outline: 2px solid var(--accent, #60a5fa);
+      outline-offset: 2px;
     }
 
     tbody td {
@@ -684,6 +694,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       renderSeverityLegend();
       elements.tableHeaders.forEach(header => {
         header.dataset.label = header.textContent;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'sort-button';
+        button.textContent = header.dataset.label;
+        header.textContent = '';
+        header.appendChild(button);
       });
       bindEvents();
       updateView();
@@ -735,7 +751,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       });
 
       elements.tableHeaders.forEach(header => {
-        header.addEventListener('click', () => {
+        header.querySelector('button').addEventListener('click', () => {
           const sortBy = header.dataset.sort;
           if (state.sortBy === sortBy) {
             state.sortDirection = state.sortDirection === 'asc' ? 'desc' : 'asc';
@@ -1031,7 +1047,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         const key = header.dataset.sort;
         const isActive = key === state.sortBy;
         const suffix = isActive ? (state.sortDirection === 'asc' ? ' ↑' : ' ↓') : '';
-        header.textContent = `${header.dataset.label}${suffix}`;
+        header.querySelector('button').textContent = `${header.dataset.label}${suffix}`;
+        header.setAttribute('aria-sort', isActive ? (state.sortDirection === 'asc' ? 'ascending' : 'descending') : 'none');
       });
     }
 
