@@ -27,7 +27,13 @@ def resolve_api_url(url: str | None, cloud_id: str | None) -> str:
     raw = (url or "").strip().rstrip("/")
     if not raw:
         return gateway
-    if "api.atlassian.com" in raw:
+
+    parsed = parse.urlparse(raw)
+    if (
+        parsed.scheme == "https"
+        and parsed.hostname == "api.atlassian.com"
+        and parsed.path.startswith("/ex/confluence/")
+    ):
         return raw
     return gateway
 
